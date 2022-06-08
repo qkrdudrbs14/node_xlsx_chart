@@ -1,32 +1,32 @@
 const express = require('express');
 const app = express();
 const port = 3000;
-const path = require('path');
 
 const XLSXChart = require('xlsx-chart');
 const xlsxChart = new XLSXChart();
+
+let _fields = [];
+let _kwh = {"chart": "column"};
+let _radiation = {"chart": "line"};
+
+for(let i=5; i < 22; i++) {
+	_fields.push(i);
+	_kwh[i] = Math.floor(Math.random() * 100);
+	_radiation[i] = Math.floor(Math.random() * 50);
+}
+
 const opts = {
     file: "chart.xlsx",
-	// chart: "column",
-    chart: "line",
 	titles: [
-		"Title 1"
+		"kWh",
+		"radiation"
 	],
-	fields: [
-		"Apple",
-		"Blackberry",
-		"Strawberry",
-		"Cowberry"
-	],
+	fields:_fields,
 	data: {
-		"Price": {
-			"Apple": 10,
-			"Blackberry": 5,
-			"Strawberry": 15,
-			"Cowberry": 20
-		}
+		"kWh": _kwh,
+		"radiation": _radiation,
 	},
-	chartTitle: "Line chart"
+	chartTitle: "Column and Line chart"
 }
 
 app.get("/", (req, res)=>{
@@ -36,7 +36,6 @@ app.get("/", (req, res)=>{
 
 app.get("/excel", (req, res) => {
     console.log("/excel");
-    // console.log(req.query.sl_id);
     xlsxChart.generate (opts, function (err, data) {
         res.set ({
           "Content-Type": "application/vnd.ms-excel",
